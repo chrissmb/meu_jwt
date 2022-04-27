@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -49,7 +50,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         UserDetails userDetails = (UserDetails) authResult.getPrincipal();
         String token = JWT.create()
                 .withSubject(userDetails.getUsername())
-                .withArrayClaim("roles", userDetails.getAuthorities().stream().map(e -> e.getAuthority()).toArray(String[]::new))
+                .withArrayClaim("roles", userDetails.getAuthorities()
+                        .stream().map(GrantedAuthority::getAuthority).toArray(String[]::new))
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
         String body = userDetails.getUsername().concat(" ").concat(token);

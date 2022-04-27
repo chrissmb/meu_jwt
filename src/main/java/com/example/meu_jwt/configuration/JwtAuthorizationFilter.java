@@ -52,7 +52,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 decodedJWT
                     .getClaim("roles")
                     .asArray(String.class))
-                .map(e -> new CustomGrantedAuthority(e))
+                .map(CustomGrantedAuthority::new)
                 .collect(Collectors.toList());
 
         if (user == null) {
